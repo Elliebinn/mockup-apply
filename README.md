@@ -1,16 +1,29 @@
 # mockup-apply
 
-> HTML 목업을 기존 웹 페이지에 적용하는 Claude Code 스킬
+> 디자이너가 만든 목업, 개발자가 만든 코드 — 그 사이를 연결합니다.
+
+"이 목업대로 만들어줘"라고 했을 때, 기존에 잘 돌아가던 기능이 날아가버린 적 있으신가요?
+이 스킬은 **새 디자인은 적용하되, 기존 기능은 한 줄도 잃지 않는 것**을 약속합니다.
+
+---
 
 ## 한국어
 
-### 설명
+### 이런 상황에서 쓰세요
 
-HTML 목업 파일을 분석하여 기존 코드와 비교하고, 변경사항을 ADD/CHANGE/KEEP으로 분류합니다. 기존 기능(다크모드, 번역, API 등)을 100% 보존하면서 새 디자인/기능만 구현합니다.
+- 디자이너(또는 AI)가 HTML 목업을 만들었는데, 실제 코드에 적용해야 할 때
+- 디자인은 바꾸고 싶지만, 이미 동작하는 기능(API, 다크모드, 번역 등)은 건들고 싶지 않을 때
+- "뭘 추가하고 뭘 건들지 말아야 하는지" 정리가 필요할 때
 
-- **ADD**: 목업에 있고 코드에 없는 것 → 구현
-- **CHANGE**: 양쪽 다 있지만 다른 것 → 수정
-- **KEEP**: 코드에 있고 목업에 없는 것 → 절대 제거하지 않음
+### 핵심 아이디어
+
+```
+ADD:    목업에 있고 코드에 없는 것 → 새로 만든다
+CHANGE: 둘 다 있지만 다르게 생긴 것 → 목업에 맞춘다
+KEEP:   코드에만 있는 것 → 절대 건들지 않는다
+```
+
+목업에 다크모드 버튼이 없다고 삭제하면 안 되잖아요. 그런 실수를 방지합니다.
 
 ### 설치
 
@@ -20,35 +33,38 @@ git clone https://github.com/Elliebinn/mockup-apply.git ~/.claude/skills/mockup-
 
 ### 사용법
 
+```bash
+/mockup-apply docs/mockups/dashboard.html              # 기본
+/mockup-apply docs/mockups/detail.html --page backtest  # 페이지 지정
+/mockup-apply docs/mockups/overview.html --analyze-only # 분석만
 ```
-/mockup-apply path/to/mockup.html
-/mockup-apply path/to/mockup.html --page dashboard
-/mockup-apply path/to/mockup.html --analyze-only
-```
 
-### 워크플로우
+### 어떻게 동작하나요?
 
-1. **분석** — 목업 vs 현재 코드 비교, 체크리스트 생성, 사용자 승인
-2. **디자인 동기화** — DESIGN.md 업데이트, 공통 CSS 클래스 확인
-3. **구현** — 체크리스트 순서대로 적용, 기존 기능 보존
-4. **검증** — 콘솔 에러 체크, 스크린샷, 사용자 확인
-
-### 요구사항
-
-- [Claude Code](https://claude.com/claude-code)
-- Playwright MCP (검증 스크린샷용)
+1. **분석** — 목업과 현재 코드를 나란히 읽고, ADD/CHANGE/KEEP 체크리스트를 만들어 보여드립니다. "이거 맞아?" 확인받고 나서야 시작합니다.
+2. **디자인 동기화** — DESIGN.md에 새 디자인 토큰을 추가하고, 공통 CSS 클래스를 정리합니다. 톤앤매너가 흐트러지지 않도록.
+3. **구현** — 체크리스트를 하나씩 처리합니다. 한꺼번에 다 바꾸지 않고, 하나 하고 확인하고 다음으로.
+4. **검증** — 콘솔 에러가 없는지, 기존 기능이 다 살아있는지 확인합니다.
 
 ---
 
 ## English
 
-### Description
+### When to use
 
-Analyzes HTML mockup files, compares them with existing code, and classifies changes as ADD/CHANGE/KEEP. Implements only new designs/features while preserving 100% of existing functionality (dark mode, translations, APIs, etc.).
+- You have an HTML mockup (from a designer or AI) and need to apply it to real code
+- You want to update the design but keep all working features (APIs, dark mode, i18n, etc.)
+- You need a clear plan of what to add, what to change, and what to leave alone
 
-- **ADD**: In mockup, not in code → Implement
-- **CHANGE**: In both, but different → Modify
-- **KEEP**: In code, not in mockup → Never remove
+### Core idea
+
+```
+ADD:    In mockup, not in code → Build it
+CHANGE: In both, but different → Match the mockup
+KEEP:   In code, not in mockup → Don't touch it
+```
+
+Just because the mockup doesn't show a dark mode toggle doesn't mean you should delete it. This skill prevents that.
 
 ### Install
 
@@ -58,35 +74,38 @@ git clone https://github.com/Elliebinn/mockup-apply.git ~/.claude/skills/mockup-
 
 ### Usage
 
+```bash
+/mockup-apply docs/mockups/dashboard.html              # basic
+/mockup-apply docs/mockups/detail.html --page backtest  # specify page
+/mockup-apply docs/mockups/overview.html --analyze-only # analysis only
 ```
-/mockup-apply path/to/mockup.html
-/mockup-apply path/to/mockup.html --page dashboard
-/mockup-apply path/to/mockup.html --analyze-only
-```
 
-### Workflow
+### How it works
 
-1. **Analyze** — Compare mockup vs current code, generate checklist, user approval
-2. **Design Sync** — Update DESIGN.md, check common CSS classes
-3. **Implement** — Apply changes per checklist, preserve existing features
-4. **Verify** — Console error check, screenshot, user confirmation
-
-### Requirements
-
-- [Claude Code](https://claude.com/claude-code)
-- Playwright MCP (for verification screenshots)
+1. **Analyze** — Reads the mockup and current code side by side. Generates an ADD/CHANGE/KEEP checklist and waits for your approval before touching anything.
+2. **Design Sync** — Updates DESIGN.md with new tokens, ensures common CSS classes are used consistently.
+3. **Implement** — Works through the checklist one item at a time. No big-bang rewrites.
+4. **Verify** — Checks for console errors and confirms all existing features still work.
 
 ---
 
 ## 中文
 
-### 说明
+### 使用场景
 
-分析HTML原型文件，与现有代码进行比较，将变更分类为ADD/CHANGE/KEEP。在100%保留现有功能（暗黑模式、翻译、API等）的同时，仅实现新设计/功能。
+- 设计师（或AI）制作了HTML原型，需要应用到实际代码中
+- 想更新设计，但不想影响已有功能（API、暗黑模式、国际化等）
+- 需要清晰地整理哪些该添加、哪些该修改、哪些不能动
 
-- **ADD**: 原型中有，代码中没有 → 实现
-- **CHANGE**: 两边都有但不同 → 修改
-- **KEEP**: 代码中有，原型中没有 → 绝不删除
+### 核心理念
+
+```
+ADD:    原型中有，代码中没有 → 新建
+CHANGE: 两边都有，但样式不同 → 按原型改
+KEEP:   只在代码中有 → 绝对不动
+```
+
+原型里没有暗黑模式按钮，不代表应该删掉它。这个技能就是为了防止这种事情发生。
 
 ### 安装
 
@@ -96,25 +115,25 @@ git clone https://github.com/Elliebinn/mockup-apply.git ~/.claude/skills/mockup-
 
 ### 使用方法
 
-```
-/mockup-apply path/to/mockup.html
-/mockup-apply path/to/mockup.html --page dashboard
-/mockup-apply path/to/mockup.html --analyze-only
+```bash
+/mockup-apply docs/mockups/dashboard.html              # 基本用法
+/mockup-apply docs/mockups/detail.html --page backtest  # 指定页面
+/mockup-apply docs/mockups/overview.html --analyze-only # 仅分析
 ```
 
 ### 工作流程
 
-1. **分析** — 比较原型与现有代码，生成检查清单，等待用户批准
-2. **设计同步** — 更新DESIGN.md，检查公共CSS类
-3. **实现** — 按检查清单顺序应用变更，保留现有功能
-4. **验证** — 控制台错误检查、截图、用户确认
-
-### 要求
-
-- [Claude Code](https://claude.com/claude-code)
-- Playwright MCP（用于验证截图）
+1. **分析** — 并排阅读原型和现有代码，生成ADD/CHANGE/KEEP检查清单，等待你确认后才开始动手。
+2. **设计同步** — 更新DESIGN.md中的设计令牌，确保公共CSS类的一致性。
+3. **实现** — 按检查清单逐项处理，不会一次性大改。
+4. **验证** — 检查控制台错误，确认所有现有功能仍然正常工作。
 
 ---
+
+## Requirements
+
+- [Claude Code](https://claude.com/claude-code)
+- Playwright MCP (optional, for verification screenshots)
 
 ## License
 
